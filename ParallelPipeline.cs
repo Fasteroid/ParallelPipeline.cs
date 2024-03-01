@@ -38,7 +38,7 @@ namespace Common {
         /// Runs <paramref name="process"/> on each <paramref name="input"/> member in parallel.
         /// </summary>
         /// <param name="process">Do this to each element of <paramref name="input"/></param>
-        public static ParallelPipeline<In, Out> StartBy(IEnumerable<In> input, Func<In, Out> process) {
+        public static ParallelPipeline<In, Out> Foreach(IEnumerable<In> input, Func<In, Out> process) {
             return new ParallelPipeline<In, Out>(
                 input.Select( element => Task.Run(() => process(element)) )
             );
@@ -48,7 +48,7 @@ namespace Common {
         /// Waits for all elements to process, then runs <paramref name="process"/> for each result in parallel.
         /// </summary>
         /// <param name="process">Do this for each result of the previous step</param>
-        public ParallelPipeline<Out, NextOut> ThenAll<NextOut>( Func<Out, NextOut> process ) {
+        public ParallelPipeline<Out, NextOut> Next<NextOut>( Func<Out, NextOut> process ) {
             return new ParallelPipeline<Out, NextOut>(
                 Task.WhenAll(Tasks).ContinueWith( 
                     all => all.Result.Select( element => Task.Run(() => process(element)) ) 
@@ -59,7 +59,7 @@ namespace Common {
         /// <summary>
         /// Call at the end of the pipeline and await it to eventually get the results.
         /// </summary>
-        public async Task<List<Out>> Results() {
+        public async Task<List<Out>> Return() {
             return (await Task.WhenAll(Tasks)).ToList();
         }
 
