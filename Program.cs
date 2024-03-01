@@ -10,11 +10,11 @@ var results = await ParallelPipeline<int, int>.Foreach(victims, (int victim) => 
         RandomWaiter.Wait();
         Console.WriteLine($"{victim} did step 0...");
         return victim;
-    }).Next( (int victim) => {
+    }).Next( async (int victim) => {
         RandomWaiter.Wait();
         Console.WriteLine($"{victim} did step 1...");
         return victim;
-    }).Next( (int victim) => {
+    }).Next<int>( (int victim) => {
         RandomWaiter.Wait();
         Console.WriteLine($"{victim} did step 2...");
         return victim;

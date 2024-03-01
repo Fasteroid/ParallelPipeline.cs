@@ -45,6 +45,16 @@ namespace Common {
         }
 
         /// <summary>
+        /// Runs <paramref name="process"/> on each <paramref name="input"/> member in parallel.
+        /// </summary>
+        /// <param name="process">Do this to each element of <paramref name="input"/></param>
+        public static ParallelPipeline<In, Out> Foreach(IEnumerable<In> input, Func<In, Task<Out>> process) {
+            return new ParallelPipeline<In, Out>(
+                input.Select( element => Task.Run(async () => await process(element)) )
+            );
+        }
+
+        /// <summary>
         /// Waits for all elements to process, then runs <paramref name="process"/> for each result in parallel.
         /// </summary>
         /// <param name="process">Do this for each result of the previous step</param>
@@ -52,6 +62,18 @@ namespace Common {
             return new ParallelPipeline<Out, NextOut>(
                 Task.WhenAll(Tasks).ContinueWith( 
                     all => all.Result.Select( element => Task.Run(() => process(element)) ) 
+                ).Result
+            );
+        }
+
+        /// <summary>
+        /// Waits for all elements to process, then runs <paramref name="process"/> for each result in parallel.
+        /// </summary>
+        /// <param name="process">Do this for each result of the previous step</param>
+        public ParallelPipeline<Out, NextOut> Next<NextOut>( Func<Out, Task<NextOut>> process ) {
+            return new ParallelPipeline<Out, NextOut>(
+                Task.WhenAll(Tasks).ContinueWith( 
+                    all => all.Result.Select( element => Task.Run(async () => await process(element)) ) 
                 ).Result
             );
         }
