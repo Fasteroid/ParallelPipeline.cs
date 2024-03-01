@@ -1,4 +1,4 @@
-﻿
+﻿using System.Linq; // Older versions of C# might need this explicitly
 
 namespace Common {
 
