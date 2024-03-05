@@ -1,6 +1,6 @@
 ﻿using System.Linq; // Older versions of C# might need this explicitly
 
-namespace Common {
+namespace Fasteroid {
 
      /*
      * ParallelPipeline.cs - MIT License
